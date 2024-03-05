@@ -1,6 +1,7 @@
 const pg = require('pg');
 const client = new pg.Client(process.env.DATABASE_URL || 'postgres://localhost/acme_store_db');
 const uuid = require('uuid');
+const bcrypt = require('bcrypt');
 
 async function createTables() {
   const SQL = `
@@ -35,7 +36,8 @@ async function createUser(username, password) {
     VALUES($1, $2, $3)
     RETURNING *;
   `;
-  const response = await client.query(SQL, [uuid.v4(), username, password]);
+  const hash = await bcrypt.hash(password, 5);
+  const response = await client.query(SQL, [uuid.v4(), username, hash]);
   return response.rows[0];
 };
 
@@ -47,7 +49,18 @@ async function createProduct(name) {
   `;
   const response = await client.query(SQL, [uuid.v4(), name]);
   return response.rows[0];
-} 
+};
+
+async function createFavorite(user_id, product_id) {
+  const SQL = `
+    INSERT INTO favorites(id, user_id, product_id)
+    VALUES($1, $2, $3)
+    RETURNING *;
+  `;
+  const response = await client.query(SQL, [uuid.v4(), user_id, product_id]);
+  return response.rows[0];
+};
+
 async function fetchUsers() {
   const SQL = `
     SELECT id, username FROM users;
@@ -64,11 +77,23 @@ async function fetchProducts() {
   return response.rows;
 }
 
+async function fetchFavorites(id) {
+  const SQL = `
+    SELECT products.name
+    FROM favorites
+    JOIN products ON favorites.product_id = products.id
+    WHERE favorites.user_id = $1;
+  `;
+  const response = await client.query(SQL, [id]);
+  return response.rows;
+};
 module.exports = {
   client,
   createTables,
   createUser,
   createProduct,
+  createFavorite,
   fetchUsers,
-  fetchProducts
+  fetchProducts,
+  fetchFavorites
 };
