@@ -6,8 +6,13 @@ const {
     createFavorite,
     fetchUsers,
     fetchProducts, 
-    fetchFavorites
+    fetchFavorites,
+    destroyFavorite
   } = require('./db');
+
+  const express = require('express');
+  const app = express();
+
   
   const init = async() => {
     await client.connect();
@@ -37,5 +42,11 @@ const {
       createFavorite(ron.id, wand.id)
     ]);
      console.log(await fetchFavorites(harry.id));
+     await destroyFavorite(favorites[0].id);
+     console.log(await fetchFavorites(hermoine.id));
+     //console.log(favorites);
+
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, ()=> console.log(`listening on port ${PORT}`));
   };
   init();
