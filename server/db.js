@@ -78,12 +78,16 @@ async function fetchProducts() {
 }
 
 async function fetchFavorites(id) {
-  const SQL = `
-    SELECT products.name
-    FROM favorites
-    JOIN products ON favorites.product_id = products.id
-    WHERE favorites.user_id = $1;
+  const SQL = ` 
+    SELECT * FROM favorites
+    WHERE user_id = $1;
   `;
+  //const SQL = `
+  //  SELECT products.name
+  //  FROM favorites
+  //  JOIN products ON favorites.product_id = products.id
+  //  WHERE favorites.user_id = $1;
+  //`;
   const response = await client.query(SQL, [id]);
   return response.rows;
 };
