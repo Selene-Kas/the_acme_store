@@ -13,6 +13,29 @@ const {
   const express = require('express');
   const app = express();
 
+  app.get('/api/users', async(req, res, next) => {
+    try {
+      res.send(await fetchUsers());
+    } catch(err) {
+      next(err);
+    }
+  });
+
+  app.get('/api/products', async(req, res, next) => {
+    try {
+      res.send(await fetchProducts());
+    } catch(err) {
+      next(err);
+    }
+  });
+
+  app.get('/api/users/:id/favorites', async(req, res, next) => {
+    try {
+      res.send(await fetchFavorites(req.params.id));
+    } catch(err) {
+      next(err);
+    }
+  });
   
   const init = async() => {
     await client.connect();
