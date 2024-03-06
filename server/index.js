@@ -36,6 +36,25 @@ const {
       next(err);
     }
   });
+
+  app.post('/api/users/:userId/favorites/:productId', async(req, res, next) => {
+    try {
+      res.status(201).send(await createFavorite(
+         req.params.userId, req.params.productId
+      ));
+    } catch(err) {
+      next(err);
+    }
+  });
+
+  app.delete('/api/users/:userId/favorites/:id', async(req, res, next) => {
+    try {
+      await destroyFavorite(req.params.userId , req.params.id);
+      res.sendStatus(204);
+    } catch(err) {
+      next(err);
+    }
+  });
   
   const init = async() => {
     await client.connect();
@@ -65,9 +84,8 @@ const {
       createFavorite(ron.id, wand.id)
     ]);
      console.log(await fetchFavorites(harry.id));
-     await destroyFavorite(favorites[0].id);
-     console.log(await fetchFavorites(hermoine.id));
-     //console.log(favorites);
+     //await destroyFavorite(favorites[0].id);
+     //console.log(await fetchFavorites(hermoine.id));
 
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, ()=> console.log(`listening on port ${PORT}`));
